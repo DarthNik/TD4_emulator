@@ -209,7 +209,7 @@ void com(char code[]){
 void auto_mode(char code[], int herz){
     while(1){
 	if (pc > 15)
-	    break;
+	    pc = 0;
 	sleep(1/herz);
 	com(code);
     }
@@ -220,7 +220,7 @@ void manual_mode(char code[]){
     char m[1];
     while(1){
 	if (pc > 15)
-	    break;
+	    pc = 0;
 	scanf("%c", m);
 	if (strcmp(m, "p") == 0){
 	    printf("Пауза...для продолжения нажмите Enter\n");
