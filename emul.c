@@ -84,7 +84,7 @@ void com(char code[]){
     memcpy(buf, cd + 4, 4);
     if (strncmp(cd, "0000", 4) == 0){
 	char* endptr;
-	int num = strtol(cd + 4, &endptr, 10); 
+	int num = strtol(cd + 4, &endptr, 2) & 0xF; 
 	char command[10] = "ADD A,";
 	strcat(command, buf);
 	new_print(A, B, c, out, pc, command);
@@ -94,7 +94,7 @@ void com(char code[]){
 
     else if (strncmp(cd, "0101", 4)  == 0){
 	char* endptr;
-        int num = strtol(cd + 4, &endptr, 10);
+        int num = strtol(cd + 4, &endptr, 2) & 0xF;
         char command[10] = "ADD B,";
 	strcat(command, buf);
         new_print(A, B, c, out, pc, command);
@@ -104,22 +104,22 @@ void com(char code[]){
 
     else if (strncmp(cd, "0011", 4) == 0){
         char* endptr;
-        int num = strtol(cd + 4, &endptr, 10);
+        int num = strtol(cd + 4, &endptr, 2) & 0xF;
         char command[10] = "MOV A,";
 	strcat(command, buf);
         new_print(A, B, c, out, pc, command); 
-	A = num;
+	A = convert(num);
 	pc++;
 	c = 0;
     }
 
     else if (strncmp(cd, "0111", 4)  == 0){
         char* endptr;
-        int num = strtol(cd + 4, &endptr, 10);
+        int num = strtol(cd + 4, &endptr, 2) & 0xF;
         char command[10] = "MOV B,";
 	strcat(command, buf);
         new_print(A, B, c, out, pc, command); 
-        B = num;
+        B = convert(num);
         pc++;
 	c = 0;
     }
@@ -165,18 +165,18 @@ void com(char code[]){
 
     else if (strncmp(cd, "1011", 4)  == 0){
         char* endptr;
-        int num = strtol(cd + 4, &endptr, 10);
+        int num = strtol(cd + 4, &endptr, 2) & 0xF;
         char command[10] = "OUT ";
 	strcat(command, buf);
         new_print(A, B, c, out, pc, command);
-        out = num;
+        out = convert(num);
         pc++;
 	c = 0;
     }
 
     else if (strncmp(cd, "1111", 4)  == 0){
         char* endptr;
-        int num = strtol(cd + 4, &endptr, 10);
+        int num = strtol(cd + 4, &endptr, 2) & 0xF;
         char command[10] = "JMP ";
 	strcat(command, buf);
         new_print(A, B, c, out, pc, command);
@@ -186,7 +186,7 @@ void com(char code[]){
 
     else if (strncmp(cd, "1110", 4)  == 0){
         char* endptr;
-        int num = strtol(cd + 4, &endptr, 10);
+        int num = strtol(cd + 4, &endptr, 2) & 0xF;
         char command[10] = "JNC ";
 	strcat(command, buf);
         new_print(A, B, c, out, pc, command);
@@ -222,11 +222,6 @@ void manual_mode(char code[]){
 	if (pc > 15)
 	    pc = 0;
 	scanf("%c", m);
-	if (strcmp(m, "p") == 0){
-	    printf("Пауза...для продолжения нажмите Enter\n");
-	    scanf("%c", m);
-	    continue;
-	}
 	com(code);
     }
 }
@@ -240,16 +235,16 @@ int main(int argc, char argv[]){
     }
 
     char code[128];
-    int r = 0;
     int c;
     while((c = getc(fd)) != EOF){
         strcat(code, Bin(c, 8));
     }
 
     fclose(fd);
-    
+        
     //Выбор режима
     printf("Выберите режим запуска:\n1 - ручной\n2 - автоматический\nВвод: ");
+    int r = 0;
     scanf("%d", &r);
     if (r == 1)
         manual_mode(code);
